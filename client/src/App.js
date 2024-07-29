@@ -21,6 +21,7 @@ function App() {
             <Route index element={<IndexPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            {/* Route after authentication*/}
             <Route path="/account" element={<ProfilePage />} />
             <Route path="/account/bookings" element={<BookingsPage />} />
             <Route path="/account/bookings/:id" element={<BookingPage />} />
