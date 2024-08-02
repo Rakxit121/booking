@@ -18,19 +18,16 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
       if (!isFormValid) {
         toast.error("Please enter a valid Gmail address and password.");
         return;
       }
-
       const res = await axios.post(
         `/api/auth/login`,
         { email, password },
         { withCredentials: true }
       );
-
       if (res && res.data.success) {
         toast.success(res.data && res.data.message);
         navigate("/");

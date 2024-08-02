@@ -7,7 +7,7 @@ import multer from "multer";
 
 const router = express.Router();
 
-// upload pic by link
+// upload pic by link 
 router.post("/upload-by-link", uploadByLinkController);
 
 // upload by photo
