@@ -127,6 +127,59 @@ export const profileController = async (req, res) => {
   }
 };
 
+export const updateProfileController = async (req, res) => {
+  try {
+    const { token } = req.cookies;
+    if (token) {
+      const { name, email, password } = req.body;
+      const user = JWT.verify(token, process.env.JWT_SECRET);
+      const updatedData = { name, email };
+
+      // Only update password if provided
+      if (password) {
+        // Hash the password before updating
+        const hashedPassword = await bcrypt.hash(password, 10);
+        updatedData.password = hashedPassword;
+      }
+
+      // Find user and update
+      const updatedUser = await userModel.findByIdAndUpdate(user.id, updatedData, {
+        new: true, // Return the updated document
+        runValidators: true, // Validate before updating
+      });
+
+      if (!updatedUser) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Profile updated successfully",
+        user: {
+          name: updatedUser.name,
+          email: updatedUser.email,
+          _id: updatedUser._id,
+        },
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error updating profile",
+      error: error.message,
+    });
+  }
+};
+
 export const logoutController = async (req, res) => {
   res.cookie("token", "").json(true);
 };
+
