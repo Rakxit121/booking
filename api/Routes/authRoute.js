@@ -4,6 +4,7 @@ import {
   logoutController,
   profileController,
   registerController,
+  updateProfileController, 
 } from "../Controllers/authController.js";
 
 const router = express.Router();
@@ -19,5 +20,8 @@ router.get("/profile", profileController);
 
 // logout
 router.post("/logout", logoutController);
+
+// update profile
+router.put('/update-profile', updateProfileController);
 
 export default router;

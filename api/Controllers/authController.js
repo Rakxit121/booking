@@ -1,6 +1,6 @@
+import JWT from "jsonwebtoken";
 import userModel from "../Models/userModel.js";
 import { comaprePassword, hashPassword } from "../helper/authHelper.js";
-import JWT from "jsonwebtoken";
 
 export const registerController = async (req, res) => {
   try {
@@ -16,18 +16,15 @@ export const registerController = async (req, res) => {
     if (!password) {
       return res.send({ message: "Password is required" });
     }
-
     //check user
     const existingUser = await userModel.findOne({ email });
-
     // existing user
     if (existingUser) {
       return res.status(200).send({
         success: false,
-        message: "Already Register Please login",
+        message: "Already Registered Please login",
       });
     }
-
     //register user
     const hashedPassword = await hashPassword(password);
     //save
@@ -132,12 +129,20 @@ export const updateProfileController = async (req, res) => {
     const { token } = req.cookies;
     if (token) {
       const { name, email, password } = req.body;
+
+      // Verify token
       const user = JWT.verify(token, process.env.JWT_SECRET);
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: "Unauthorized",
+        });
+      }
+
       const updatedData = { name, email };
 
-      // Only update password if provided
+      // Hash the password if provided
       if (password) {
-        // Hash the password before updating
         const hashedPassword = await bcrypt.hash(password, 10);
         updatedData.password = hashedPassword;
       }
@@ -171,6 +176,7 @@ export const updateProfileController = async (req, res) => {
       });
     }
   } catch (error) {
+    console.error("Error updating profile:", error.message); // Log error for debugging
     res.status(500).json({
       success: false,
       message: "Error updating profile",
@@ -178,7 +184,6 @@ export const updateProfileController = async (req, res) => {
     });
   }
 };
-
 export const logoutController = async (req, res) => {
   res.cookie("token", "").json(true);
 };
