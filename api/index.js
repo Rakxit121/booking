@@ -12,28 +12,6 @@ import cookieParser from "cookie-parser";
 import { fileURLToPath } from "url"; // Import the fileURLToPath function
 import path from "path"; // Import the path module
 
-
-//  Epress https
-const https = require('https');
-const fs = require('fs');
-const path = require('path');
-
-// Load SSL certificate
-const sslServer = https.createServer({
-    key: fs.readFileSync(path.join(__dirname, 'cert', 'key.pem')), // Replace with your key path
-    cert: fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem')) // Replace with your certificate path
-}, app);
-
-// Your other app configurations and routes here
-app.get('/', (req, res) => {
-    res.send('Welcome to the Secure Server');
-});
-
-// Start the HTTPS server
-sslServer.listen(443, () => {
-    console.log('Secure server running on port 443');
-});
-
 // config env
 dotenv.config();
 

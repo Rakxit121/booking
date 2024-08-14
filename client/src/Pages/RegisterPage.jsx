@@ -9,11 +9,20 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  // Function to validate the email
   const emailIsValid = (email) => {
     const emailRegex = /^[a-zA-Z0-9._-]+@gmail\.com$/;
     return emailRegex.test(email);
   };
-  const isFormValid = name && emailIsValid(email) && password;
+
+  // Function to validate the password
+  const passwordIsValid = (password) => {
+    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    return passwordRegex.test(password);
+  };
+
+  // Check if the form is valid
+  const isFormValid = name && emailIsValid(email) && passwordIsValid(password);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,7 +43,9 @@ const RegisterPage = () => {
       toast.error("Something went wrong");
     }
   };
+
   const enabledButtonClass = isFormValid ? "primary" : "disabled";
+
   return (
     <div className="mt-4 grow flex items-center justify-around">
       <div className="mb-32">
@@ -66,7 +77,7 @@ const RegisterPage = () => {
             Submit
           </button>
           <div className="text-center py-2 text-gray-500">
-            Already a memeber?{" "}
+            Already a member?{" "}
             <Link className="underline text-black" to="/login">
               Login now
             </Link>
