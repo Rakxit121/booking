@@ -1,1 +1,0 @@
-﻿Fix place listing bugs
