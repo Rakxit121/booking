@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import BookingDates from "../components/BookingDates";
-import AddressLink from "../components/AddressLink";
+import { loadStripe } from "@stripe/stripe-js";
 import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import AddressLink from "../components/AddressLink";
+import BookingDates from "../components/BookingDates";
 import PlaceGallery from "../components/PlaceGallery";
+
+const stripePromise = loadStripe("your-public-stripe-key");
 
 const BookingPage = () => {
   const { id } = useParams();
   const [booking, setBooking] = useState(null);
+
   useEffect(() => {
     if (id) {
       axios.get("/api/auth/bookings").then((response) => {
@@ -19,9 +23,25 @@ const BookingPage = () => {
     }
   }, [id]);
 
+  const handleCheckout = async () => {
+    const stripe = await stripePromise;
+    const response = await axios.post("/api/checkout-session", {
+      bookingId: booking._id,
+      amount: booking.price,
+    });
+    const { sessionId } = response.data;
+
+    // Redirect to Stripe Checkout
+    const result = await stripe.redirectToCheckout({ sessionId });
+    if (result.error) {
+      console.error(result.error.message);
+    }
+  };
+
   if (!booking) {
     return "";
   }
+
   return (
     <div className="my-8">
       <h1 className="text-3xl">{booking.place.title}</h1>
@@ -33,7 +53,9 @@ const BookingPage = () => {
         </div>
         <div className="bg-primary p-6 text-white rounded-2xl">
           <div>Total price</div>
-          <div className="text-3xl">${booking.price}</div>
+          <Link onClick={handleCheckout} className="text-3xl">
+            ${booking.price}
+          </Link>
         </div>
       </div>
       <PlaceGallery place={booking.place} />
