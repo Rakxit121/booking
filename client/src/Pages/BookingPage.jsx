@@ -1,12 +1,13 @@
-import { loadStripe } from "@stripe/stripe-js";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import AddressLink from "../components/AddressLink";
 import BookingDates from "../components/BookingDates";
 import PlaceGallery from "../components/PlaceGallery";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
 
-const stripePromise = loadStripe("pk_test_51PoJcqRw5EgGnz4NlybGoDjDc91UgF6Kd5HMUtBOzrTk8oJLmPIu6mJUpCLTT38DZrHAYyjsEvmQFRhxQHvJ6HeB004fgbfnUO");
+const stripePromise = loadStripe("your-public-stripe-key");
 
 const BookingPage = () => {
   const { id } = useParams();
@@ -25,7 +26,7 @@ const BookingPage = () => {
 
   const handleCheckout = async () => {
     const stripe = await stripePromise;
-    const response = await axios.post("/api/payment", {
+    const response = await axios.post("/api/checkout-session", {
       bookingId: booking._id,
       amount: booking.price,
     });
