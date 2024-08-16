@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import AddressLink from "../components/AddressLink";
 import BookingDates from "../components/BookingDates";
 import PlaceGallery from "../components/PlaceGallery";
@@ -8,6 +8,7 @@ import PlaceGallery from "../components/PlaceGallery";
 const BookingPage = () => {
   const { id } = useParams();
   const [booking, setBooking] = useState(null);
+
   useEffect(() => {
     if (id) {
       axios.get("/api/auth/bookings").then((response) => {
@@ -19,9 +20,28 @@ const BookingPage = () => {
     }
   }, [id]);
 
+  const handleCheckout = () => {
+    const stripe = window.Stripe('pk_test_51PoJcqRw5EgGnz4NlybGoDjDc91UgF6Kd5HMUtBOzrTk8oJLmPIu6mJUpCLTT38DZrHAYyjsEvmQFRhxQHvJ6HeB004fgbfnUO'); // Replace with your own publishable key
+
+    stripe.redirectToCheckout({
+      lineItems: [{
+        price: 'price_1J......', // Replace with your price ID
+        quantity: 1,
+      }],
+      mode: 'payment',
+      successUrl: window.location.origin + '/success',
+      cancelUrl: window.location.origin + '/cancel',
+    }).then((result) => {
+      if (result.error) {
+        console.error(result.error.message);
+      }
+    });
+  };
+
   if (!booking) {
     return "";
   }
+
   return (
     <div className="my-8">
       <h1 className="text-3xl">{booking.place.title}</h1>
@@ -33,7 +53,9 @@ const BookingPage = () => {
         </div>
         <div className="bg-primary p-6 text-white rounded-2xl">
           <div>Total price</div>
-          <Link><div className="text-3xl">${booking.price}</div></Link>
+          <button onClick={handleCheckout} className="text-3xl bg-green-500 px-4 py-2 rounded">
+            ${booking.price}
+          </button>
         </div>
       </div>
       <PlaceGallery place={booking.place} />
